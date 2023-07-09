@@ -183,7 +183,7 @@ const handleLinkCommand = (req, res) => {
 const handleMentionCommand = (req, res) => {
   //const isAdmin = req.body.member.user.roles.includes('admin');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
-  console.log(req.body.member.user);
+  console.log(req.body.member.roles);
   /*if (!isAdmin) {
     res.send({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
