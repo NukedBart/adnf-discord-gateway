@@ -106,7 +106,8 @@ const handleHelpCommand = (req, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: formattedCommands
+      content: formattedCommands,
+      flags: 64
     }
   });
 };
@@ -122,7 +123,8 @@ const handleRegisterCommand = (req, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `Register command received. Username: ${username}`
+      content: `Register command received. Username: ${username}`,
+      flags: 64 // Set the Ephemeral flag to make the message visible only to the user
     }
   });
 };
@@ -138,7 +140,8 @@ const handleLinkCommand = (req, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `Link command received. Username: ${username}`
+      content: `Link command received. Username: ${username}`,
+      flags: 64
     }
   });
 };
