@@ -68,7 +68,7 @@ const parseCommands = (commands, index = 0) => {
     return '';
   }
   const command = commands[index];
-  const formattedCommand = `/${command.name}: ${command.description}\n`;
+  const formattedCommand = `[/${command.name}](command:${command.name})  ${command.description}\n`;
 
   return formattedCommand + parseCommands(commands, index + 1);
 }
