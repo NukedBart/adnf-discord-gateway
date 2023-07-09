@@ -1,7 +1,5 @@
 require('dotenv').config();
-const https = require('https');
 const express = require('express');
-const fs = require('fs');
 const axios = require('axios');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
 
@@ -38,12 +36,6 @@ discordApi.interceptors.response.use((response) => {
 });
 
 const port = process.env.PORT || 3131;
-const sslOptions = {
-  key: fs.readFileSync('private.key'),
-  cert: fs.readFileSync('certificate.crt'),
-};
-
-const server = https.createServer(sslOptions, app);
 
 const slash_commands = [
     {
@@ -147,6 +139,6 @@ app.get('/', async (req, res) => {
   return res.send('ADNF Discord Bot by NukedBart');
 });
 
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`Application is running on port ${port}`);
 });
