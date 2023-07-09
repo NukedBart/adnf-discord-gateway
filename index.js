@@ -139,7 +139,7 @@ const handleHelpCommand = async (req, res) => {
     console.error('Error fetching guild roles:', error);
     // error handler
   }
-  const formattedCommands = parseCommands(isAdmin, clickable_slash_commands);
+  const formattedCommands = parseCommands(clickable_slash_commands, isAdmin);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
