@@ -180,7 +180,7 @@ const handleLinkCommand = (req, res) => {
 };
 
 // handle /mention
-const handleMentionCommand = (req, res) => {
+const handleMentionCommand = async (req, res) => {
   try {
     const guildId = req.body.guild.id; // 获取服务器 ID
     const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // 发起获取角色列表的请求
