@@ -101,7 +101,7 @@ const clickable_slash_commands = [
       "options": [{"isPublic": true}]
     },
     {
-      "id": "1127447095893315597",
+      "id": "1127487633975693387",
       "name": "mention",
       "description": "[ADMIN] It helps locating a player.",
       "options": [{"isPublic": false}]
