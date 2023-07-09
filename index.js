@@ -181,7 +181,9 @@ const handleLinkCommand = (req, res) => {
 
 // handle /mention
 const handleMentionCommand = (req, res) => {
-  const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
+  console.log(req.body.guild);
+  console.log(req.body.guild.roles);
+  /*const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
   if (!isAdmin) {
@@ -211,7 +213,7 @@ const handleMentionCommand = (req, res) => {
     data: {
       content: `Hey <@${mentionedUserId}>! One of our admins had mentioned you! Is something bad happening?`
     }
-  });
+  });*/
 };
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (req, res) => {
