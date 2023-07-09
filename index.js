@@ -181,10 +181,10 @@ const handleLinkCommand = (req, res) => {
 
 // handle /mention
 const handleMentionCommand = (req, res) => {
-  //const isAdmin = req.body.member.user.roles.includes('admin');
+  const isAdmin = req.body.member.roles.some(role => role === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
-  /*if (!isAdmin) {
+  if (!isAdmin) {
     res.send({
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
@@ -211,7 +211,7 @@ const handleMentionCommand = (req, res) => {
     data: {
       content: `Hey <@${mentionedUserId}>! One of our admins had mentioned you! Is something bad happening?`
     }
-  });*/
+  });
 };
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (req, res) => {
