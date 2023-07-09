@@ -125,8 +125,21 @@ const parseCommands = (isAdmin, commands, index = 0) => {
 }
 
 // handle /help
-const handleHelpCommand = (req, res) => {
-  const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
+const handleHelpCommand = async (req, res) => {
+try {
+    const guildId = req.body.guild.id; // 获取服务器 ID
+    const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // 发起获取角色列表的请求
+    const roles = rolesResponse.data; // 获取角色列表
+
+    // 现在你可以访问 roles 数组来获取角色信息
+    console.log(roles);
+
+    // 其他代码...
+  } catch (error) {
+    console.error('Error fetching guild roles:', error);
+    // 处理错误情况...
+  }
+  const isAdmin = req.body.member.roles.some(roleId => rolesResponse.data.find(role => role.id === roleId)?.name === 'Staff');
   const formattedCommands = parseCommands(isAdmin, clickable_slash_commands);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -194,7 +207,7 @@ const handleMentionCommand = async (req, res) => {
     console.error('Error fetching guild roles:', error);
     // 处理错误情况...
   }
-  const isAdmin = req.body.member.roles.includes('Staff');
+  const isAdmin = req.body.member.roles.some(roleId => rolesResponse.data.find(role => role.id === roleId)?.name === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
   if (!isAdmin) {
