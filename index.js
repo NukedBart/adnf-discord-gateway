@@ -116,14 +116,16 @@ const handleHelpCommand = (req, res) => {
 const handleRegisterCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
-
+  const discordUsername = req.body.member.user.username;
+  
   // Use the 'username' value as needed
   console.log('Username:', username);
+  console.log('Issuer:', discordUsername);
   
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `Register command received. Username: ${username}`,
+      content: `${discordUsername} Register command received. Username: ${username}`,
       flags: 64 // Set the Ephemeral flag to make the message visible only to the user
     }
   });
@@ -133,14 +135,16 @@ const handleRegisterCommand = (req, res) => {
 const handleLinkCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
-
+  const discordUsername = req.body.member.user.username;
+  
   // Use the 'username' value as needed
   console.log('Username:', username);
+  console.log('Issuer:', discordUsername);
 
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `Link command received. Username: ${username}`,
+      content: `${discordUsername} Link command received. Username: ${username}`,
       flags: 64
     }
   });
