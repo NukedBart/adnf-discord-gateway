@@ -66,6 +66,18 @@ const slash_commands = [
           "required": true
 		}
       ]
+    },
+    {
+      "name": "mention",
+      "description": "[ADMIN] It helps locating a player.",
+      "options": [
+		{
+		  "name": "User ID",
+          "description": "Enter the user ID you want to mention",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		}
+      ]
     }
   ];
   
@@ -74,35 +86,48 @@ const clickable_slash_commands = [
       "id": "1127447095893315594",
       "name": "help",
       "description": "Displays this help information",
-      "options": []
+      "options": [{"isPublic": true}]
     },
     {
       "id": "1127447095893315595",
       "name": "register",
       "description": "Use the current Discord account to register an ADNF account",
-      "options": ["username"]
+      "options": [{"isPublic": true}]
     },
     {
       "id": "1127447095893315596",
       "name": "link",
       "description": "Link your Discord account to ADNF",
-      "options": ["username"]
+      "options": [{"isPublic": true}]
+    },
+    {
+      "id": "1127447095893315597",
+      "name": "mention",
+      "description": "[ADMIN] It helps locating a player.",
+      "options": [{"isPublic": false}]
     }
   ];
 
-const parseCommands = (commands, index = 0) => {
+const parseCommands = (isAdmin, commands, index = 0) => {
   if (index >= commands.length) {
     return '';
   }
   const command = commands[index];
   const formattedCommand = `</${command.name}:${command.id}>  ${command.description}\n`;
-
-  return formattedCommand + parseCommands(commands, index + 1);
+  
+  if(command.options.isPublic) {
+    return formattedCommand + parseCommands(commands, index + 1);
+  }
+  if(isAdmin) {
+    return formattedCommand + parseCommands(commands, index + 1);
+  }
+  return parseCommands(commands, index + 1);
 }
 
 // handle /help
 const handleHelpCommand = (req, res) => {
-  const formattedCommands = parseCommands(clickable_slash_commands);
+  const isAdmin = req.body.member.user.roles.includes('admin');
+  const formattedCommands = parseCommands(isAdmin, clickable_slash_commands);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
@@ -117,10 +142,12 @@ const handleRegisterCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
   const discordUsername = req.body.member.user.username;
+  const userId = req.body.member.user.id;
+  const discriminator = req.body.member.user.discriminator;
   
   // Use the 'username' value as needed
   console.log('Username:', username);
-  console.log('Issuer:', discordUsername);
+  console.log('Issuer:', discordUsername, "#", discriminator, " (", userId, ")");
   
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -136,6 +163,8 @@ const handleLinkCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
   const discordUsername = req.body.member.user.username;
+  const userId = req.body.member.user.id;
+  const discriminator = req.body.member.user.discriminator;
   
   // Use the 'username' value as needed
   console.log('Username:', username);
@@ -146,6 +175,41 @@ const handleLinkCommand = (req, res) => {
     data: {
       content: `${discordUsername} Link command received. Username: ${username}`,
       flags: 64
+    }
+  });
+};
+
+// handle /mention
+const handleMentionCommand = (req, res) => {
+  const isAdmin = req.body.member.user.roles.includes('admin');
+  const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
+
+  if (!isAdmin) {
+    res.send({
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: 'You do not have permission to use this command.',
+        flags: 64
+      }
+    });
+    return;
+  }
+
+  if (!mentionedUserId) {
+    res.send({
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: 'Please provide a valid user ID.',
+        flags: 64
+      }
+    });
+    return;
+  }
+
+  res.send({
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: `Hey <@${mentionedUserId}>! One of our admins had mentioned you! Is something bad happening?`
     }
   });
 };
@@ -165,6 +229,9 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (re
         break;
       case 'link':
         handleLinkCommand(req, res);
+        break;
+      case 'mention':
+        handleMentionCommand(req, res);
         break;
       default:
         res.send({
