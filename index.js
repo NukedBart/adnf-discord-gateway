@@ -54,20 +54,41 @@ const slash_commands = [
       "options": []
     }
   ];
+  
+const clickable_slash_commands = [
+    {
+      "id": "1127447095893315594",
+      "name": "help",
+      "description": "Displays this help information",
+      "options": []
+    },
+    {
+      "id": "1127447095893315595",
+      "name": "register",
+      "description": "Use the current Discord account to register an ADNF account",
+      "options": ["username"]
+    },
+    {
+      "id": "1127447095893315596",
+      "name": "link",
+      "description": "Link your Discord account to ADNF",
+      "options": ["username"]
+    }
+  ];
 
 const parseCommands = (commands, index = 0) => {
   if (index >= commands.length) {
     return '';
   }
   const command = commands[index];
-  const formattedCommand = `[/${command.name}](command:${command.name})  ${command.description}\n`;
+  const formattedCommand = `</${command.name}:command.id>  ${command.description}\n`;
 
   return formattedCommand + parseCommands(commands, index + 1);
 }
 
 // handle /help
 const handleHelpCommand = (req, res) => {
-  const formattedCommands = parseCommands(slash_commands);
+  const formattedCommands = parseCommands(clickable_slash_commands);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
