@@ -1,113 +1,152 @@
-
-// const { clientId, guildId, token, publicKey } = require('./config.json');
-require('dotenv').config()
-const APPLICATION_ID = process.env.APPLICATION_ID 
-const TOKEN = process.env.TOKEN 
-const PUBLIC_KEY = process.env.PUBLIC_KEY || 'not set'
-const GUILD_ID = process.env.GUILD_ID 
-
-
-const axios = require('axios')
+require('dotenv').config();
+const https = require('https');
 const express = require('express');
+const fs = require('fs');
+const axios = require('axios');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
 
-
 const app = express();
-// app.use(bodyParser.json());
+app.use(express.json());
 
-const discord_api = axios.create({
+const discordApi = axios.create({
   baseURL: 'https://discord.com/api/',
   timeout: 3000,
   headers: {
-	"Access-Control-Allow-Origin": "*",
-	"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-	"Access-Control-Allow-Headers": "Authorization",
-	"Authorization": `Bot ${TOKEN}`
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+    "Access-Control-Allow-Headers": "Authorization",
+    "Authorization": `Bot ${process.env.TOKEN}`
   }
 });
 
-
-
-
-app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
-  const interaction = req.body;
-
-  if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-    console.log(interaction.data.name)
-    if(interaction.data.name == 'yo'){
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: {
-          content: `Yo ${interaction.member.user.username}!`,
-        },
-      });
-    }
-
-    if(interaction.data.name == 'dm'){
-      // https://discord.com/developers/docs/resources/user#create-dm
-      let c = (await discord_api.post(`/users/@me/channels`,{
-        recipient_id: interaction.member.user.id
-      })).data
-      try{
-        // https://discord.com/developers/docs/resources/channel#create-message
-        let res = await discord_api.post(`/channels/${c.id}/messages`,{
-          content:'Yo! I got your slash command. I am not able to respond to DMs just slash commands.',
-        })
-        console.log(res.data)
-      }catch(e){
-        console.log(e)
-      }
-
-      return res.send({
-        // https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data:{
-          content:'👍'
-        }
-      });
-    }
-  }
-
+// 添加请求拦截器
+discordApi.interceptors.request.use((config) => {
+  console.log('Making request to Discord API:', config.url);
+  return config;
+}, (error) => {
+  console.error('Error in request:', error);
+  return Promise.reject(error);
 });
 
+// 添加响应拦截器
+discordApi.interceptors.response.use((response) => {
+  console.log('Received response from Discord API:', response.config.url);
+  return response;
+}, (error) => {
+  console.error('Error in response:', error);
+  return Promise.reject(error);
+});
 
+const port = process.env.PORT || 3131;
+const sslOptions = {
+  key: fs.readFileSync('private.key'),
+  cert: fs.readFileSync('certificate.crt'),
+};
 
-app.get('/register_commands', async (req,res) =>{
-  let slash_commands = [
+const server = https.createServer(sslOptions, app);
+
+const slash_commands = [
     {
-      "name": "yo",
-      "description": "replies with Yo!",
+      "name": "help",
+      "description": "Displays this help information",
       "options": []
     },
     {
-      "name": "dm",
-      "description": "sends user a DM",
+      "name": "register",
+      "description": "Use the current Discord account to register an ADNF account",
+      "options": []
+    },
+    {
+      "name": "link",
+      "description": "Link your Discord account to ADNF",
       "options": []
     }
-  ]
-  try
-  {
-    // api docs - https://discord.com/developers/docs/interactions/application-commands#create-global-application-command
-    let discord_response = await discord_api.put(
-      `/applications/${APPLICATION_ID}/guilds/${GUILD_ID}/commands`,
-      slash_commands
-    )
-    console.log(discord_response.data)
-    return res.send('commands have been registered')
-  }catch(e){
-    console.error(e.code)
-    console.error(e.response?.data)
-    return res.send(`${e.code} error from discord`)
+  ];
+
+const parseCommands = () => {
+  if (index >= commands.length) {
+    return '';
   }
-})
+  const command = commands[index];
+  const formattedCommand = `/${command.name}: ${command.description}\n`;
 
+  return formattedCommand + parseCommands(commands, index + 1);
+}
 
-app.get('/', async (req,res) =>{
-  return res.send('Follow documentation ')
-})
+// handle /help
+const handleHelpCommand = (req, res) => {
+  const formattedCommands = parseCommands(slash_commands);
+  res.send({
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: formattedCommands
+    }
+  });
+};
 
+// handle /register
+const handleRegisterCommand = (req, res) => {
+  res.send({
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: 'This is the register command!'
+    }
+  });
+};
 
-app.listen(8999, () => {
+// handle /link
+const handleLinkCommand = (req, res) => {
+  res.send({
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: 'This is the link command!'
+    }
+  });
+};
 
-})
+app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (req, res) => {
+  const interaction = req.body;
 
+  if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+    const { name } = interaction.data;
+
+    switch (name) {
+      case 'help':
+        handleHelpCommand(req, res);
+        break;
+      case 'register':
+        handleRegisterCommand(req, res);
+        break;
+      case 'link':
+        handleLinkCommand(req, res);
+        break;
+      default:
+        res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: 'Invalid command!'
+          }
+        });
+    }
+  }
+});
+
+app.get('/register_commands', async (req, res) => {
+  try {
+    const discordResponse = await discordApi.put(`/applications/${process.env.APPLICATION_ID}/guilds/${process.env.GUILD_ID}/commands`, slash_commands);
+    console.log(discordResponse.data);
+    return res.send('Commands have been registered');
+  } catch (error) {
+    console.error(error.code);
+    console.error(error.response?.data);
+    return res.send(`${error.code} error from Discord`);
+  }
+});
+
+app.get('/', async (req, res) => {
+  return res.send('ADNF Discord Bot by NukedBart');
+});
+
+server.listen(port, () => {
+  console.log(`Application is running on port ${port}`);
+});
