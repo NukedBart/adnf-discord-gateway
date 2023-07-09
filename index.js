@@ -108,7 +108,7 @@ const clickable_slash_commands = [
     }
   ];
 
-const parseCommands = (commands, index = 0, isAdmin=false) => {
+const parseCommands = (commands, isAdmin=false, index = 0) => {
   if (index >= commands.length) {
     return '';
   }
@@ -116,12 +116,12 @@ const parseCommands = (commands, index = 0, isAdmin=false) => {
   const formattedCommand = `</${command.name}:${command.id}>  ${command.description}\n`;
   
   if(command.options.isPublic) {
-    return formattedCommand + parseCommands(commands, index + 1, isAdmin);
+    return formattedCommand + parseCommands(commands, isAdmin, index + 1);
   }
   if(isAdmin) {
-    return formattedCommand + parseCommands(commands, index + 1, isAdmin);
+    return formattedCommand + parseCommands(commands, isAdmin, index + 1);
   }
-  return parseCommands(commands, index + 1, isAdmin);
+  return parseCommands(commands, isAdmin, index + 1);
 }
 
 // handle /help
