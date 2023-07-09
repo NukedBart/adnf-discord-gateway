@@ -72,7 +72,7 @@ const slash_commands = [
       "description": "[ADMIN] It helps locating a player.",
       "options": [
 		{
-		  "name": "User ID",
+		  "name": "UserID",
           "description": "Enter the user ID you want to mention",
           "type": 3,  // 3 represents STRING type
           "required": true
