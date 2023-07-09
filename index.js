@@ -52,6 +52,12 @@ const slash_commands = [
           "description": "Enter your username",
           "type": 3,  // 3 represents STRING type
           "required": true
+		},
+		{
+		  "name": "password",
+          "description": "Enter your password",
+          "type": 3,  // 3 represents STRING type
+          "required": true
 		}
       ]
     },
@@ -62,6 +68,30 @@ const slash_commands = [
 		{
 		  "name": "username",
           "description": "Enter your username",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		},
+		{
+		  "name": "password",
+          "description": "Enter your password",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		}
+      ]
+    },
+    {
+      "name": "relink",
+      "description": "Change the Discord account linked to ADNF",
+      "options": [
+		{
+		  "name": "username",
+          "description": "Enter your username",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		},
+		{
+		  "name": "password",
+          "description": "Enter your password",
           "type": 3,  // 3 represents STRING type
           "required": true
 		}
@@ -98,6 +128,12 @@ const clickable_slash_commands = [
       "id": "1127447095893315596",
       "name": "link",
       "description": "Link your Discord account to ADNF",
+      "options": [{"isPublic": true}]
+    },
+    {
+      "id": "1127447095893315596",
+      "name": "relink",
+      "description": "Change the Discord account linked to ADNF",
       "options": [{"isPublic": true}]
     },
     {
@@ -140,6 +176,8 @@ const handleHelpCommand = async (req, res) => {
     // error handler
   }
   const formattedCommands = parseCommands(clickable_slash_commands, isAdmin);
+  console.log(req.body.member.user);
+  console.log(req.body.member);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
@@ -153,6 +191,7 @@ const handleHelpCommand = async (req, res) => {
 const handleRegisterCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
+  const password = req.body.data.options.find(option => option.name === 'password').value;
   const discordUsername = req.body.member.user.username;
   const userId = req.body.member.user.id;
   const discriminator = req.body.member.user.discriminator;
@@ -164,7 +203,7 @@ const handleRegisterCommand = (req, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `${discordUsername} Register command received. Username: ${username}`,
+      content: `${discordUsername} Register command received. Username: ${username}, Password: ||${password}||`,
       flags: 64 // Set the Ephemeral flag to make the message visible only to the user
     }
   });
@@ -174,6 +213,7 @@ const handleRegisterCommand = (req, res) => {
 const handleLinkCommand = (req, res) => {
   // Access the value of 'username' parameter from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
+  const password = req.body.data.options.find(option => option.name === 'password').value;
   const discordUsername = req.body.member.user.username;
   const userId = req.body.member.user.id;
   const discriminator = req.body.member.user.discriminator;
@@ -185,7 +225,29 @@ const handleLinkCommand = (req, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: `${discordUsername} Link command received. Username: ${username}`,
+      content: `${discordUsername} Link command received. Username: ${username}, Password: ||${password}||`,
+      flags: 64
+    }
+  });
+};
+
+// handle /relink
+const handleRelinkCommand = (req, res) => {
+  // Access the value of 'username' parameter from the request body
+  const username = req.body.data.options.find(option => option.name === 'username').value;
+  const password = req.body.data.options.find(option => option.name === 'password').value;
+  const discordUsername = req.body.member.user.username;
+  const userId = req.body.member.user.id;
+  const discriminator = req.body.member.user.discriminator;
+  
+  // Use the 'username' value as needed
+  console.log('Username:', username);
+  console.log('Issuer:', discordUsername);
+
+  res.send({
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: `${discordUsername} Link command received. Username: ${username}, Password: ||${password}||`,
       flags: 64
     }
   });
@@ -253,6 +315,9 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (re
         break;
       case 'link':
         handleLinkCommand(req, res);
+        break;
+      case 'relink':
+        handleRelinkCommand(req, res);
         break;
       case 'mention':
         handleMentionCommand(req, res);
