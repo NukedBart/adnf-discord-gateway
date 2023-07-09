@@ -126,20 +126,19 @@ const parseCommands = (isAdmin, commands, index = 0) => {
 
 // handle /help
 const handleHelpCommand = async (req, res) => {
-try {
-    const guildId = req.body.guild.id; // 获取服务器 ID
-    const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // 发起获取角色列表的请求
-    const roles = rolesResponse.data; // 获取角色列表
-
-    // 现在你可以访问 roles 数组来获取角色信息
+  let isAdmin = false; // 默认为 false，表示不具有 "Staff" 角色
+  try {
+    const guildId = req.body.guild.id; // get server ID
+    const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // get server roles
+    const roles = rolesResponse.data; // get roles raw data
+    // roles are now accessible
     console.log(roles);
 
-    // 其他代码...
+    isAdmin = req.body.member.roles.some(roleId => roles.find(role => role.id === roleId)?.name === 'Staff');
   } catch (error) {
     console.error('Error fetching guild roles:', error);
-    // 处理错误情况...
+    // error handler
   }
-  const isAdmin = req.body.member.roles.some(roleId => rolesResponse.data.find(role => role.id === roleId)?.name === 'Staff');
   const formattedCommands = parseCommands(isAdmin, clickable_slash_commands);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -194,20 +193,19 @@ const handleLinkCommand = (req, res) => {
 
 // handle /mention
 const handleMentionCommand = async (req, res) => {
+  let isAdmin = false; // 默认为 false，表示不具有 "Staff" 角色
   try {
-    const guildId = req.body.guild.id; // 获取服务器 ID
-    const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // 发起获取角色列表的请求
-    const roles = rolesResponse.data; // 获取角色列表
-
-    // 现在你可以访问 roles 数组来获取角色信息
+    const guildId = req.body.guild.id; // get server ID
+    const rolesResponse = await discordApi.get(`/guilds/${guildId}/roles`); // get server roles
+    const roles = rolesResponse.data; // get roles raw data
+    // roles are now accessible
     console.log(roles);
 
-    // 其他代码...
+    isAdmin = req.body.member.roles.some(roleId => roles.find(role => role.id === roleId)?.name === 'Staff');
   } catch (error) {
     console.error('Error fetching guild roles:', error);
-    // 处理错误情况...
+    // error handler
   }
-  const isAdmin = req.body.member.roles.some(roleId => rolesResponse.data.find(role => role.id === roleId)?.name === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
   if (!isAdmin) {
