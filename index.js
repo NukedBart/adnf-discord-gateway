@@ -182,7 +182,7 @@ const handleLinkCommand = (req, res) => {
 // handle /mention
 const handleMentionCommand = (req, res) => {
   console.log(req.body.guild);
-  console.log(req.body.guild.roles);
+  console.log(req.body.guild.cache);
   /*const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
