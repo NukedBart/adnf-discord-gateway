@@ -46,12 +46,26 @@ const slash_commands = [
     {
       "name": "register",
       "description": "Use the current Discord account to register an ADNF account",
-      "options": []
+      "options": [
+		{
+		  "name": "username",
+          "description": "Enter your username",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		}
+      ]
     },
     {
       "name": "link",
       "description": "Link your Discord account to ADNF",
-      "options": []
+      "options": [
+		{
+		  "name": "username",
+          "description": "Enter your username",
+          "type": 3,  // 3 represents STRING type
+          "required": true
+		}
+      ]
     }
   ];
   
@@ -99,20 +113,32 @@ const handleHelpCommand = (req, res) => {
 
 // handle /register
 const handleRegisterCommand = (req, res) => {
+  // Access the value of 'username' parameter from the request body
+  const username = req.body.data.options.find(option => option.name === 'username').value;
+
+  // Use the 'username' value as needed
+  console.log('Username:', username);
+  
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: 'This is the register command!'
+      content: `Register command received. Username: ${username}`
     }
   });
 };
 
 // handle /link
 const handleLinkCommand = (req, res) => {
+  // Access the value of 'username' parameter from the request body
+  const username = req.body.data.options.find(option => option.name === 'username').value;
+
+  // Use the 'username' value as needed
+  console.log('Username:', username);
+
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: 'This is the link command!'
+      content: `Link command received. Username: ${username}`
     }
   });
 };
