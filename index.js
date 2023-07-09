@@ -206,7 +206,7 @@ const handleMentionCommand = async (req, res) => {
     console.error('Error fetching guild roles:', error);
     // error handler
   }
-  const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
+  const mentionedUserId = req.body.data.options.find(option => option.name === 'userid')?.value;
   console.log(req.body.member.roles);
   if (!isAdmin) {
     res.send({
