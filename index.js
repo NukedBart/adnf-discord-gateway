@@ -126,7 +126,7 @@ const parseCommands = (isAdmin, commands, index = 0) => {
 
 // handle /help
 const handleHelpCommand = (req, res) => {
-  const isAdmin = req.body.member.user.roles.includes('admin');
+  const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
   const formattedCommands = parseCommands(isAdmin, clickable_slash_commands);
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -181,7 +181,7 @@ const handleLinkCommand = (req, res) => {
 
 // handle /mention
 const handleMentionCommand = (req, res) => {
-  const isAdmin = req.body.member.roles.some(role => role === 'Staff');
+  const isAdmin = req.body.member.roles.some(roleId => req.body.guild.roles.cache.get(roleId)?.name === 'Staff');
   const mentionedUserId = req.body.data.options.find(option => option.name === 'id')?.value;
   console.log(req.body.member.roles);
   if (!isAdmin) {
