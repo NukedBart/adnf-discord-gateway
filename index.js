@@ -63,7 +63,7 @@ const slash_commands = [
     }
   ];
 
-const parseCommands = () => {
+const parseCommands = (commands, index = 0) => {
   if (index >= commands.length) {
     return '';
   }
