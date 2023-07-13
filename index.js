@@ -364,7 +364,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (re
     handleMentionCommand(req, res);
     break;
   default:
-    sendPublic'Invalid command!');
+    sendPublic('Invalid command!');
   }
 });
 
