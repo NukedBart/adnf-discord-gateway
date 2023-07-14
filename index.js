@@ -133,7 +133,7 @@ const clickable_slash_commands = [
       "options": {"isPublic": true}
     },
     {
-      "id": "1127447095893315596", 
+      "id": "1127502115162566706", 
       "name": "relink",
       "description": "Change the Discord account linked to ADNF",
       "options": {"isPublic": true}
