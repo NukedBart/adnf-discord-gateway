@@ -266,7 +266,7 @@ const handleRegisterCommand = async (req, res) => {
   console.log('Username:', username);
   console.log('Issuer:', discordUsername, '#', discriminator, ' (', userId, ')');
   
-  const result = await processRegister(username, password, discordUsername + discriminator, userId);
+  const result = await processRegister(username, password, discordUsername + "#" + discriminator, userId);
   
   switch (result)
   {
