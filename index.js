@@ -146,7 +146,7 @@ const clickable_slash_commands = [
     }
   ];
 
-const sendPublic = (pending_content) => {
+const sendPublic = (pending_content, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
@@ -155,7 +155,7 @@ const sendPublic = (pending_content) => {
   });
 }
 
-const sendPrivate = (pending_content) => {
+const sendPrivate = (pending_content, res) => {
   res.send({
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
@@ -266,25 +266,25 @@ const handleRegisterCommand = (req, res) => {
   switch (result)
   {
   case '4061':
-    sendPrivate(`<@${userId}> That usename has already been taken. Try another one.`);
+    sendPrivate(`<@${userId}> That usename has already been taken. Try another one.`, res);
     break;
   case '4062':
-    sendPrivate(`<@${userId}> That usename is invalid. \nA valid username should only contain A-Z, a-z, 0-9; and should contain at least 6 characters; and 16 characters maximum. \nEx. Validname123`);
+    sendPrivate(`<@${userId}> That usename is invalid. \nA valid username should only contain A-Z, a-z, 0-9; and should contain at least 6 characters; and 16 characters maximum. \nEx. Validname123`, res);
     break
   case '4063':
-    sendPrivate(`<@${userId}> The provided password is either invalid or not secure enough. \nYour password should be: \n -At least 8 characters long. \n -Contain an upper-case letter. \n -Contain a lower-case letter. \n -Contain a number. \n -64 characters maximum. \n Ex. Val1dpassw0rd`);
+    sendPrivate(`<@${userId}> The provided password is either invalid or not secure enough. \nYour password should be: \n -At least 8 characters long. \n -Contain an upper-case letter. \n -Contain a lower-case letter. \n -Contain a number. \n -64 characters maximum. \n Ex. Val1dpassw0rd`, res);
     break;
   case 'bruh':
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
     break
   case '5000':
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
     break;
   case '200':
-    sendPrivate(`<@${userId}> Your ADNF account ${username} with password ||${password}|| is now ready and linked to ${discordUsername}#${discriminator}<${userId}> !`);
+    sendPrivate(`<@${userId}> Your ADNF account ${username} with password ||${password}|| is now ready and linked to ${discordUsername}#${discriminator}<${userId}> !`, res);
     break;
   default:
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
     break;
   }
 };
@@ -304,7 +304,7 @@ const handleLinkCommand = (req, res) => {
   
   // TODO: add link function
 
-  sendPrivate(`${discordUsername} Link command received. Username: ${username}, Password: ||${password}||`);
+  sendPrivate(`${discordUsername} Link command received. Username: ${username}, Password: ||${password}||`, res);
 };
 
 // handle /relink
@@ -322,7 +322,7 @@ const handleRelinkCommand = (req, res) => {
 
   // TODO: add relink function
 
-  sendPrivate(`${discordUsername} Relink command received. Username: ${username}, Password: ||${password}||`);
+  sendPrivate(`${discordUsername} Relink command received. Username: ${username}, Password: ||${password}||`, res);
 };
 
 // handle /mention
@@ -330,14 +330,14 @@ const handleMentionCommand = async (req, res) => {
   let isAdmin = await hasAdminRole(req, res);
   const mentionedUserId = req.body.data.options.find(option => option.name === 'userid')?.value;
   if (!isAdmin) {
-    sendPrivate('You do not have permission to use this command.');
+    sendPrivate('You do not have permission to use this command.', res);
     return;
   }
   if (!mentionedUserId) {
-    sendPrivate('Please provide a valid user ID.');
+    sendPrivate('Please provide a valid user ID.', res);
     return;
   }
-  sendPublic(`Hey <@${mentionedUserId}>! One of our admins had mentioned you! Is something bad happening?`);
+  sendPublic(`Hey <@${mentionedUserId}>! One of our admins had mentioned you! Is something bad happening?`, res);
 };
 
 app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (req, res) => {
@@ -364,7 +364,7 @@ app.post('/interactions', verifyKeyMiddleware(process.env.PUBLIC_KEY), async (re
     handleMentionCommand(req, res);
     break;
   default:
-    sendPublic('Invalid command!');
+    sendPublic('Invalid command!', res);
   }
 });
 
