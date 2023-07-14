@@ -206,7 +206,7 @@ const checkPasswordStrength = (string) => {
   return regex.test(string);
 }
 
-const processRegister = (username, password, discordUsername, userId) => {
+const processRegister = async (username, password, discordUsername, userId) => {
   if (!isAlphanumeric(username)) return '4062';
   if (!checkPasswordStrength(password)) return '4063';
   const options = {
@@ -223,22 +223,27 @@ const processRegister = (username, password, discordUsername, userId) => {
   const postData = `--botRegisterRequest\r\nContent-Disposition: form-data; name='username'\r\n\r\n${username}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='password'\r\n\r\n${password}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='discord'\r\n\r\n${discordUsername}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='discordid'\r\n\r\n${userId}\r\n--botRegisterRequest--`;
   
   // Send the HTTP request
-  const httpsRequest = https.request(options, function (response) {
-    const chunks = [];
-  
-    response.on('data', function (chunk) {
-      chunks.push(chunk);
+  return new Promise((resolve, reject) => {
+    const httpsRequest = https.request(options, function (response) {
+      const chunks = [];
+
+      response.on('data', function (chunk) {
+        chunks.push(chunk);
+      });
+
+      response.on('end', function () {
+        const body = Buffer.concat(chunks);
+        resolve(body.toString());
+      });
+
+      response.on('error', function (error) {
+        console.error(error);
+        reject('5000');
+      });
     });
-  
-    response.on('end', function (chunk) {
-      const body = Buffer.concat(chunks);
-      return body.toString();
-    });
-  
-    response.on('error', function (error) {
-      console.error(error);
-      return '5000';
-    });
+
+    httpsRequest.write(postData);
+    httpsRequest.end();
   });
 }
 
@@ -249,7 +254,7 @@ const handleHelpCommand = async (req, res) => {
 };
 
 // handle /register
-const handleRegisterCommand = (req, res) => {
+const handleRegisterCommand = async (req, res) => {
   // Access the value of parameters from the request body
   const username = req.body.data.options.find(option => option.name === 'username').value;
   const password = req.body.data.options.find(option => option.name === 'password').value;
@@ -261,7 +266,7 @@ const handleRegisterCommand = (req, res) => {
   console.log('Username:', username);
   console.log('Issuer:', discordUsername, '#', discriminator, ' (', userId, ')');
   
-  const result = processRegister(username, password, discordUsername + discriminator, userId);
+  const result = await processRegister(username, password, discordUsername + discriminator, userId);
   
   switch (result)
   {
