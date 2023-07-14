@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const { InteractionType, InteractionResponseType, verifyKeyMiddleware } = require('discord-interactions');
-const http = require('follow-redirects').http;
+const https = require('follow-redirects').https;
 const fs = require('fs');
 
 const app = express();
@@ -208,11 +208,11 @@ const checkPasswordStrength = (string) => {
 
 const processRegister = (username, password, discordUsername, userId) => {
   if (!isAlphanumeric(username)) return '4062';
-  if (!checkPasswordStrength(username)) return '4063';
+  if (!checkPasswordStrength(password)) return '4063';
   const options = {
     method: 'POST',
-    hostname: '43.248.97.194',
-    port: 60280,
+    hostname: 'adnf.ucany.net',
+    port: 443,
     path: '/api/register',
     headers: {
       'Content-Type': 'multipart/form-data; boundary=botRegisterRequest'
@@ -223,7 +223,7 @@ const processRegister = (username, password, discordUsername, userId) => {
   const postData = `--botRegisterRequest\r\nContent-Disposition: form-data; name='username'\r\n\r\n${username}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='password'\r\n\r\n${password}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='discord'\r\n\r\n${discordUsername}\r\n--botRegisterRequest\r\nContent-Disposition: form-data; name='discordid'\r\n\r\n${userId}\r\n--botRegisterRequest--`;
   
   // Send the HTTP request
-  const httpRequest = http.request(options, function (response) {
+  const httpsRequest = https.request(options, function (response) {
     const chunks = [];
   
     response.on('data', function (chunk) {
