@@ -289,7 +289,7 @@ const handleRegisterCommand = async (req, res) => {
     sendPrivate(`<@${userId}> Your ADNF account ${username} with password ||${password}|| is now ready and linked to ${discordUsername}#${discriminator}<${userId}> !`, res);
     break;
   default:
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred. Got unknown.`, res);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred. Got ${result}.`, res);
     break;
   }
 };
