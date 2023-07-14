@@ -118,31 +118,31 @@ const clickable_slash_commands = [
       "id": "1127447095893315594",
       "name": "help",
       "description": "Displays this help information",
-      "options": [{"isPublic": true}]
+      "options": {"isPublic": true}
     },
     {
       "id": "1127447095893315595",
       "name": "register",
       "description": "Use the current Discord account to register an ADNF account",
-      "options": [{"isPublic": true}]
+      "options": {"isPublic": true}
     },
     {
       "id": "1127447095893315596",
       "name": "link",
       "description": "Link your Discord account to ADNF",
-      "options": [{"isPublic": true}]
+      "options": {"isPublic": true}
     },
     {
-      "id": "1127447095893315596",
+      "id": "1127447095893315596", 
       "name": "relink",
       "description": "Change the Discord account linked to ADNF",
-      "options": [{"isPublic": true}]
+      "options": {"isPublic": true}
     },
     {
       "id": "1127487633975693387",
       "name": "mention",
       "description": "[ADMIN] It helps locating a player.",
-      "options": [{"isPublic": false}]
+      "options": {"isPublic": false}
     }
   ];
 
@@ -153,7 +153,7 @@ const sendPublic = (pending_content, res) => {
       content: pending_content
     }
   });
-}
+};
 
 const sendPrivate = (pending_content, res) => {
   res.send({
@@ -163,23 +163,19 @@ const sendPrivate = (pending_content, res) => {
       flags: 64
     }
   });
-}
+};
 
-const parseCommands = (commands, isAdmin=false, index = 0) => {
-  if (index >= commands.length) 
+const parseCommands = (commands, isAdmin = false, index = 0) => {
+  if (index >= commands.length)
     return '';
-  
+
   const command = commands[index];
   const formattedCommand = `</${command.name}:${command.id}>  ${command.description}\n`;
-  
-  if(command.options.isPublic) 
+
+  if (command.options.isPublic || isAdmin) 
     return formattedCommand + parseCommands(commands, isAdmin, index + 1);
-    
-  if(isAdmin) 
-    return formattedCommand + parseCommands(commands, isAdmin, index + 1);
-    
-  return parseCommands(commands, isAdmin, index + 1);
-}
+  return parseCommands(commands, isAdmin, index + 1, accumulatedCommands);
+};
 
 const hasAdminRole = async (req, res) => {
   try {
@@ -194,17 +190,17 @@ const hasAdminRole = async (req, res) => {
     console.error('Error fetching guild roles:', error);
     return false;
   }
-}
+};
 
 const isAlphanumeric = (string) => {
   const regex = /^[a-zA-Z0-9]{6,16}$/;
   return regex.test(string);
-}
+};
 
 const checkPasswordStrength = (string) => {
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,64}$/;
   return regex.test(string);
-}
+};
 
 const processRegister = async (username, password, discordUsername, userId) => {
   if (!isAlphanumeric(username)) return '4062';
@@ -245,12 +241,12 @@ const processRegister = async (username, password, discordUsername, userId) => {
     httpsRequest.write(postData);
     httpsRequest.end();
   });
-}
+};
 
 // handle /help
 const handleHelpCommand = async (req, res) => {
   let isAdmin = await hasAdminRole(req, res);
-  sendPrivate(parseCommands(clickable_slash_commands, isAdmin));
+  sendPrivate(parseCommands(clickable_slash_commands, isAdmin), res);
 };
 
 // handle /register
@@ -270,7 +266,7 @@ const handleRegisterCommand = async (req, res) => {
   
   switch (result)
   {
-  case '4061':
+  case '4061': //catch 4061, notify user existance. 
     sendPrivate(`<@${userId}> That usename has already been taken. Try another one.`, res);
     break;
   case '4062':
