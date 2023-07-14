@@ -280,16 +280,16 @@ const handleRegisterCommand = async (req, res) => {
     sendPrivate(`<@${userId}> The provided password is either invalid or not secure enough. \nYour password should be: \n -At least 8 characters long. \n -Contain an upper-case letter. \n -Contain a lower-case letter. \n -Contain a number. \n -64 characters maximum. \n Ex. Val1dpassw0rd`, res);
     break;
   case 'bruh':
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred. Got rejected.`, res);
     break
   case '5000':
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred. Got 5000.`, res);
     break;
   case '200':
     sendPrivate(`<@${userId}> Your ADNF account ${username} with password ||${password}|| is now ready and linked to ${discordUsername}#${discriminator}<${userId}> !`, res);
     break;
   default:
-    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred.`, res);
+    sendPrivate(`<@${userId}> Sorry, but an unknown error had occurred. Got unknown.`, res);
     break;
   }
 };
