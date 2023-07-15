@@ -174,7 +174,7 @@ const parseCommands = (commands, isAdmin = false, index = 0) => {
 
   if (command.options.isPublic || isAdmin) 
     return formattedCommand + parseCommands(commands, isAdmin, index + 1);
-  return parseCommands(commands, isAdmin, index + 1, accumulatedCommands);
+  return parseCommands(commands, isAdmin, index + 1);
 };
 
 const hasAdminRole = async (req, res) => {
