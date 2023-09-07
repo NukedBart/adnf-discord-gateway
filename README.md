@@ -1,4 +1,4 @@
-# starter-discord-bot
+# ADNF Discord Gateway
 
 Follow these instructions after deploying this repo on Cyclic.sh
 
@@ -95,6 +95,16 @@ At this point, make sure you've collected all the variables you will use in your
     <img src="./doc/8.png"  width="600px"/>
 </p>
 
+## **6.1** Alternatively, duplicate .env.example and rename it to .env
+(Optional) Append line:
+```
+PORT=<PORT_NUMBER>
+```
+e.g. The default port for this application: 
+```
+PORT=3131
+```
+
 # Set up interactions endpoint
 **This step is VERY IMPORTANT**, it lets discord know the url at which the bot is running. Discord will send interaction event payloads to this endpoint.
 
@@ -115,37 +125,33 @@ app.post('/interactions', verifyKeyMiddleware(PUBLIC_KEY), async (req, res) => {
     ...
 ```
 
-# Register slash commands
+# Setup a reverse proxy to enable HTTPS (for self-hosters)
+TODO
+
+# Configure your DNF gateway api interactions
 1. Make sure all of the environment variables have been correctly set up
-2. Go to `https://[your bot's url].cyclic.app/register_commands`
-   This route makes a put request to register two commands on your server: `/yo` and `/dm`
+2. Go to `https://[your bot's cyclic url].cyclic.app/register_commands` or `https://[your bot's url]/register_commands`
+   This route makes a put request to register all commands needed for DNF account operations.
         ```
-        app.get('/register_commands', async (req,res) =>{
+        app.get('/register_commands', async (req,res) => {
+        ```
+        ```
+        const slash_commands = [
         ```
 
 Refer to the [discord docs](https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands) to extend this further 
 
 After registering commands, you should see them available in your discord server
 
-
 <p align="center">
-    <img src="./doc/10.png"  width="500px"/>
+    <img src="./doc/13.png"  width="500px"/>
 </p>
 
 # Try the bot!
 
-In any channel type `/yo` or `/dm`.
+In any channel type `/` for a list of commands, and register an account:
 
-NOTE: this starter does not configure 
-
-## `/yo`
-<p align="center">
-    <img src="./doc/12.png"  width="500px"/>
-</p>
-
-## `/dm`
-
-<p align="center">
-    <img src="./doc/11.png"  width="500px"/>
-</p>
+```
+/register username:abc123 password:123456
+```
 
